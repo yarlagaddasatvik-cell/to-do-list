@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenith Tasks — Modern Task Manager & To-Do List</title>
+  <meta name="description" content="A sleek, modern, and aesthetic To-Do List and Task Management web application built with HTML, CSS, and JavaScript.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background Glow Accents -->
+  <div class="glow-sphere glow-1" aria-hidden="true"></div>
+  <div class="glow-sphere glow-2" aria-hidden="true"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-badge">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+          <span class="logo-text">Zenith</span>
+        </div>
+        <div class="header-date" id="current-date-display">Today</div>
+      </div>
+
+      <div class="header-right">
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Productivity Progress Card -->
+    <section class="progress-card">
+      <div class="progress-info">
+        <div>
+          <h2 class="greeting-title" id="greeting-text">Daily Progress</h2>
+          <p class="progress-subtitle" id="progress-status-text">Keep going! You're making progress.</p>
+        </div>
+        <div class="progress-percentage-badge" id="progress-percentage">0%</div>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-bar" style="width: 0%;"></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill">
+          <span class="stat-number" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-pill stat-pending">
+          <span class="stat-number" id="stat-pending">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-pill stat-completed">
+          <span class="stat-number" id="stat-completed">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Task Creation Form Card -->
+    <section class="card input-card">
+      <form id="add-task-form" class="add-task-form">
+        <div class="input-main-row">
+          <input 
+            type="text" 
+            id="task-input" 
+            class="main-text-input" 
+            placeholder="What do you need to accomplish?" 
+            autocomplete="off" 
+            required
+            maxlength="150"
+          >
+          <button type="submit" class="primary-btn add-btn" id="add-task-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Add Task</span>
+          </button>
+        </div>
+
+        <!-- Task Metadata Options Row -->
+        <div class="options-row">
+          <!-- Category Select -->
+          <div class="option-field">
+            <label for="task-category" class="sr-only">Category</label>
+            <div class="select-wrapper">
+              <select id="task-category" class="custom-select">
+                <option value="Personal">🧘 Personal</option>
+                <option value="Work" selected>💼 Work</option>
+                <option value="Study">📚 Study</option>
+                <option value="Shopping">🛒 Shopping</option>
+                <option value="Health">🏃 Health</option>
+                <option value="Finance">💰 Finance</option>
+                <option value="Idea">💡 Idea</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Priority Select -->
+          <div class="option-field">
+            <label for="task-priority" class="sr-only">Priority</label>
+            <div class="select-wrapper">
+              <select id="task-priority" class="custom-select">
+                <option value="low">🟢 Low Priority</option>
+                <option value="medium" selected>🟡 Med Priority</option>
+                <option value="high">🔴 High Priority</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Due Date Picker -->
+          <div class="option-field date-field">
+            <label for="task-due-date" class="sr-only">Due Date</label>
+            <input type="date" id="task-due-date" class="date-input" title="Set due date">
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Toolbar: Search, Filters, & Sorting -->
+    <section class="toolbar-section">
+      <!-- Search Box -->
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Search tasks..." 
+          autocomplete="off"
+        >
+        <button type="button" id="clear-search-btn" class="clear-search-btn hidden" aria-label="Clear search">
+          &times;
+        </button>
+      </div>
+
+      <!-- Controls Row: Status Tabs & Sort -->
+      <div class="controls-row">
+        <div class="filter-tabs" role="tablist" aria-label="Filter tasks by status">
+          <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="filter-tab" data-filter="active" role="tab" aria-selected="false">Active</button>
+          <button class="filter-tab" data-filter="completed" role="tab" aria-selected="false">Completed</button>
+        </div>
+
+        <div class="sort-wrapper">
+          <label for="sort-select" class="sort-label">Sort:</label>
+          <select id="sort-select" class="sort-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="priority">Priority</option>
+            <option value="dueDate">Due Date</option>
+            <option value="alphabetical">A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-chips-scroll" id="category-chips-container">
+        <button class="category-chip active" data-category="all">All Tags</button>
+        <button class="category-chip" data-category="Work">💼 Work</button>
+        <button class="category-chip" data-category="Personal">🧘 Personal</button>
+        <button class="category-chip" data-category="Study">📚 Study</button>
+        <button class="category-chip" data-category="Shopping">🛒 Shopping</button>
+        <button class="category-chip" data-category="Health">🏃 Health</button>
+        <button class="category-chip" data-category="Finance">💰 Finance</button>
+        <button class="category-chip" data-category="Idea">💡 Idea</button>
+      </div>
+    </section>
+
+    <!-- Task List Section -->
+    <main class="tasks-section">
+      <div class="tasks-header-row">
+        <h3 class="tasks-heading" id="tasks-count-heading">Tasks (0)</h3>
+        <div class="tasks-bulk-actions">
+          <button id="clear-completed-btn" class="text-action-btn" title="Remove all completed tasks">
+            Clear Completed
+          </button>
+          <button id="clear-all-btn" class="text-action-btn danger-text" title="Clear all tasks">
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <!-- Task Items List -->
+      <ul id="task-list" class="task-list" aria-live="polite">
+        <!-- Injected via JavaScript -->
+      </ul>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-svg">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+          </svg>
+        </div>
+        <h4 class="empty-title">All clear!</h4>
+        <p class="empty-desc">No tasks match your current view. Add a task above or adjust your filters.</p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Organize effortlessly with <strong>Zenith Tasks</strong> • Saved locally in your browser</p>
+    </footer>
+  </div>
+
+  <!-- Edit Task Modal -->
+  <div id="edit-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="edit-modal-title" class="modal-title">Edit Task</h3>
+        <button id="close-modal-btn" class="icon-btn close-modal-btn" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="edit-task-form" class="modal-form">
+        <input type="hidden" id="edit-task-id">
+        <div class="form-group">
+          <label for="edit-task-title" class="form-label">Task Title</label>
+          <input type="text" id="edit-task-title" class="modal-input" required maxlength="150">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-task-category" class="form-label">Category</label>
+            <select id="edit-task-category" class="modal-select">
+              <option value="Personal">🧘 Personal</option>
+              <option value="Work">💼 Work</option>
+              <option value="Study">📚 Study</option>
+              <option value="Shopping">🛒 Shopping</option>
+              <option value="Health">🏃 Health</option>
+              <option value="Finance">💰 Finance</option>
+              <option value="Idea">💡 Idea</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-task-priority" class="form-label">Priority</label>
+            <select id="edit-task-priority" class="modal-select">
+              <option value="low">🟢 Low</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-task-due-date" class="form-label">Due Date</label>
+          <input type="date" id="edit-task-due-date" class="modal-input">
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancel-edit-btn" class="secondary-btn">Cancel</button>
+          <button type="submit" class="primary-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
